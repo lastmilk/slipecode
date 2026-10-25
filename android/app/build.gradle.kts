@@ -20,7 +20,10 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        // proot 需要直接执行应用私有目录中根文件系统里的程序；从 Android 10
+        // （API 29）开始，targetSdk >= 29 的应用会被禁止这种执行方式。
+        // Termux 等终端类应用同样把 targetSdk 固定在 28。
+        targetSdk = 28
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
         // You can force using the value of versionCode by specifying the `-P force-version-code-ignoring-abi=true`
@@ -34,6 +37,14 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    packaging {
+        jniLibs {
+            // proot 与 loader 需要以真实文件形式落在 nativeLibraryDir 中才能执行，
+            // 因此关闭“从 APK 直接加载 .so”的优化。
+            useLegacyPackaging = true
         }
     }
 }

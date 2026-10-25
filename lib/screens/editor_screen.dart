@@ -14,6 +14,7 @@ import '../services/file_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/dialogs.dart';
 import '../widgets/file_tree_panel.dart';
+import 'terminal_screen.dart';
 
 enum _UnsavedAction { save, discard }
 
@@ -444,6 +445,20 @@ class _EditorScreenState extends State<EditorScreen> {
     return p.split(relative).join(' / ');
   }
 
+  /// 打开项目终端；进入前先保存未保存的文件，返回后刷新文件树。
+  Future<void> _openTerminal() async {
+    if (_documents.values.any((document) => document.isDirty)) {
+      await _saveAll();
+    }
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => TerminalScreen(project: widget.project),
+      ),
+    );
+    if (mounted) await _loadTree();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -528,6 +543,11 @@ class _EditorScreenState extends State<EditorScreen> {
             tooltip: '文件',
             onPressed: () => _scaffoldKey.currentState?.openDrawer(),
           ),
+        IconButton(
+          icon: const Icon(Icons.terminal_rounded),
+          tooltip: '终端',
+          onPressed: _openTerminal,
+        ),
         IconButton(
           icon: const Icon(Icons.save_outlined),
           tooltip: '保存全部',

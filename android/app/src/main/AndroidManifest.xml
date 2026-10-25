@@ -1,8 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 容器内的包管理器（apk / 下载 SDK）需要网络 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="Slipecode"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:extractNativeLibs="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
